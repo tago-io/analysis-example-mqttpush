@@ -6,43 +6,44 @@ const Analysis = require('tago/analysis');
 ** Analysis Example
 ** Get Device List
 **
-** This analysis retrieves the device list of your account and print to the console.
-** There are examples on how to apply filter.
+ * Snippet to push data to MQTT. Follow this pattern within your application
+ * If you want more details about MQTT, search "MQTT" in TagoIO help center.
+ * You can find plenty of documentation about this topic.
+ * TagoIO Team.
 **
-** Environment Variables
-** In order to use this analysis, you must setup the Environment Variable table.
-**
-** account_token: Your account token
-**
-** Steps to generate an account_token:
-** 1 - Enter the following link: https://admin.tago.io/account/
-** 2 - Select your Profile.
-** 3 - Enter Tokens tab.
-** 4 - Generate a new Token with Expires Never.
-** 5 - Press the Copy Button and place at the Environment Variables tab of this analysis.
+** How to use?
+** In order to trigger this analysis you must setup a Dashboard.
+** Create a Widget "Form" and enter the variable 'push_payload' for the device you want to push with the MQTT.
+** In User Control, select this Analysis in the Analysis Option.
+** Save and use the form.
 * */
 
 async function listDevicesByTag(context) {
-  // Transform all Environment Variable to JSON.
-  const envVars = TagoUtils.env_to_obj(context.environment);
-  
-  if (!envVars.account_token) return context.log('Missing account_token environment variable');
-  const account = new TagoAccount(envVars.account_token);
-   
-  // Example of filtering devies by Tag.
-  // You can filter by: name, last_input, last_output, bucket, etc.
-  const filter = {
-    tags: [{
-      key: 'keyOfTagWeWantToSearch', value: 'valueOfTagWeWantToSearch',
-    }],
-    // bucket: '55d269211a2e236c25bb9859',
-    // name: 'My Device'
-    // name: 'My Dev*
-  }
-  // Searching all devices with tag we want
-  const devices = await account.devices.list(1, ['id', 'tags'], filter, 10000);
+  if (!scope.length) return context.log('This analysis must be triggered by a dashboard.');
 
-  context.log(devices);
+  const myData = scope.find(x => x.variable === 'push_payload') || scope[0];
+  if (!myData) return context.log('Couldnt find any variable in the scope.');
+   
+  // Create your data object to push to MQTT
+  // In this case we're sending a JSON object.
+  // You can send anything you want.
+  // Example:
+  // const myDataObject = 'This is a string';
+  const myDataObject = {
+    variable: 'temperature_celsius',
+    value: (myData.value - 32) * (5 / 9),
+    unit: 'C',
+  };
+
+  // Create a object with the options you choosed
+  const options = {
+    retain: false,
+    qos: 0,
+  };
+
+  // Publishing to MQTT
+  const MQTT = new Services(context.token).MQTT;
+  await MQTT.publish('tago/my_topic', JSON.stringify(myDataObject), myData.bucket, options).catch(context.log);
 }
 
 module.exports = new Analysis(listDevicesByTag, 'ANALYSIS TOKEN HERE');
