@@ -18,7 +18,7 @@ const Analysis = require('tago/analysis');
 ** Save and use the form.
 * */
 
-async function listDevicesByTag(context) {
+async function mqttPushExample(context, scope) {
   if (!scope.length) return context.log('This analysis must be triggered by a dashboard.');
 
   const myData = scope.find(x => x.variable === 'push_payload') || scope[0];
