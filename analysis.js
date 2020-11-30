@@ -45,17 +45,12 @@ async function mqttPushExample(context, scope) {
 
   // Publishing to MQTT
   const MQTT = new Services({ token: context.token }).MQTT;
-
-  try {
-    await MQTT.publish({
+  MQTT.publish({
       bucket: myData.bucket,
       message: JSON.stringify(myDataObject),
       topic: "tago/my_topic",
       options,
-    });
-  } catch (error) {
-    context.log(error);
-  }
+    }).then(context.log, context.log)
 }
 
 module.exports = new Analysis(mqttPushExample);
