@@ -46,7 +46,8 @@ async function mqttPushExample(context, scope) {
   // Publishing to MQTT
   const MQTT = new Services({ token: context.token }).MQTT;
   MQTT.publish({
-      bucket: myData.bucket,
+      //  use myData.bucket if using **legacy** devices.
+      bucket: myData.device,
       message: JSON.stringify(myDataObject),
       topic: "tago/my_topic",
       options,
