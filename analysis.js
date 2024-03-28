@@ -39,7 +39,6 @@ async function mqttPushExample(context, scope) {
 
   // Create a object with the options you chooses
   const options = {
-    retain: false,
     qos: 0,
   };
 
