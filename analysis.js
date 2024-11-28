@@ -53,7 +53,6 @@ async function mqttPushExample(context, scope) {
     }).then(context.log, context.log)
 }
 
-module.exports = new Analysis(mqttPushExample);
-
+Analysis.use(mqttPushExample);
 // To run analysis on your machine (external)
 // module.exports = new Analysis(mqttPushExample, { token: "YOUR-TOKEN" });
